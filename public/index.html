@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineflayer Bot Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="text"], select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #bots-list {
+            margin-top: 20px;
+        }
+        .bot-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .bot-entry input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        #log {
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mineflayer Bot Control Panel</h1>
+        <h2>Create a New Bot</h2>
+        <form id="create-bot-form">
+            <label for="host">Host</label>
+            <input type="text" id="host" placeholder="Enter server host" required>
+
+            <label for="port">Port</label>
+            <input type="text" id="port" placeholder="Enter server port" value="25565" required>
+
+            <label for="username">Bot Username</label>
+            <input type="text" id="username" placeholder="Enter bot username" required>
+
+            <label for="version">Version</label>
+            <input type="text" id="version" placeholder="Enter Minecraft version (optional)">
+
+            <button type="submit">Create Bot</button>
+        </form>
+
+        <h2>Running Bots</h2>
+        <div id="bots-list">
+            <!-- Bots will be listed here -->
+        </div>
+
+        <h2>Send Message to Bots</h2>
+        <form id="send-message-form">
+            <label for="message">Message</label>
+            <input type="text" id="message" placeholder="Enter your message" required>
+
+            <button type="button" id="sendMessageBtn">Send Message</button>
+        </form>
+
+        <div id="log">
+            <!-- Log messages will appear here -->
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>

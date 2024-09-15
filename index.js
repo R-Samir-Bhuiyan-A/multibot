@@ -18,20 +18,28 @@ app.post('/api/create-bot', (req, res) => {
     const { host, port, username, version } = req.body;
     const botId = Math.floor(Math.random() * 1000000); // Random bot ID
 
-    const bot = mineflayer.createBot({
+    const botOptions = {
         host,
         port: parseInt(port),
         username,
-        version: version || false, // Use the provided version, or autodetect if not specified
-    });
+        version: version || false // Use the provided version, or autodetect if not specified
+    };
 
-    // Store bot instance with the random bot ID
-    bots[botId] = bot;
+    // Create and store bot instance with the random bot ID
+    createBot(botOptions, botId);
+
+    res.status(200).json({ botId, message: 'Bot created successfully' });
+});
+
+// Function to create a bot
+function createBot(options, botId) {
+    const bot = mineflayer.createBot(options);
+    bots[botId] = { bot, options };
 
     // Handle bot events
     bot.once('spawn', () => {
         console.log(`Bot ${botId} has spawned.`);
-        io.emit('bot-spawn', { botId, username });
+        io.emit('bot-spawn', { botId, username: options.username });
     });
 
     bot.on('chat', (username, message) => {
@@ -42,20 +50,30 @@ app.post('/api/create-bot', (req, res) => {
     bot.on('end', () => {
         console.log(`Bot ${botId} has disconnected.`);
         io.emit('bot-disconnect', { botId });
-        delete bots[botId]; // Remove bot when disconnected
+        reconnectBot(botId); // Try to reconnect after disconnection
     });
 
     bot.on('error', (err) => {
-        console.error(`Bot ${botId} encountered an error: ${err}`);
-        io.emit('bot-error', { botId, error: err.toString() });
+        console.error(`Bot ${botId} encountered an error:`, err);
+        reconnectBot(botId); // Try to reconnect after an error
     });
+}
 
-    res.status(200).json({ botId, message: 'Bot created successfully' });
-});
+// Function to reconnect a bot after disconnect or error
+function reconnectBot(botId) {
+    const botData = bots[botId];
+    if (botData) {
+        console.log(`Attempting to reconnect bot ${botId} in 10 seconds...`);
+        setTimeout(() => {
+            // Create a new bot with the same options
+            createBot(botData.options, botId);
+        }, 10000); // Reconnect after 10 seconds
+    }
+}
 
 // Endpoint to list running bots
 app.get('/api/bots', (req, res) => {
-    const botList = Object.keys(bots).map(botId => ({ id: botId, username: bots[botId].username || 'Unknown' }));
+    const botList = Object.keys(bots).map(botId => ({ id: botId, username: bots[botId].bot.username || 'Unknown' }));
     res.status(200).json(botList);
 });
 
@@ -65,7 +83,7 @@ app.post('/api/send-message', (req, res) => {
 
     botIds.forEach((id) => {
         if (bots[id]) {
-            bots[id].chat(message);
+            bots[id].bot.chat(message);
             console.log(`Message sent to bot ${id}: ${message}`);
         }
     });
@@ -81,7 +99,7 @@ io.on('connection', (socket) => {
 
         botIds.forEach((id) => {
             if (bots[id]) {
-                bots[id].chat(message); // Send the message through each selected bot
+                bots[id].bot.chat(message); // Send the message through each selected bot
             }
         });
 

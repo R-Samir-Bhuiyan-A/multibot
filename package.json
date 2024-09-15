@@ -3,6 +3,9 @@
     "express": "^4.21.0",
     "http": "^0.0.1-security",
     "mineflayer": "^4.20.1",
+    "mineflayer-pathfinder": "^2.4.5",
+    "node-fetch": "^3.3.2",
+    "pathfinder": "^0.3.0-1",
     "socket.io": "^4.7.5"
   }
 }

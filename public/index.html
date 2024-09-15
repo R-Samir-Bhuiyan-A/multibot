@@ -4,66 +4,126 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mineflayer Bot Control</title>
+    <meta name="description" content="Control panel for managing Mineflayer bots, created by Samir Bhuiyan.">
+    <meta name="author" content="Samir Bhuiyan">
+    <meta name="keywords" content="Mineflayer, Minecraft Bot, Control Panel, Bot Management, Samir Bhuiyan">
+    <meta name="robots" content="index, follow">
+
+    <title>Mineflayer Bot Control Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #1e1e1e; /* Dark background */
+            color: #ffffff; /* Light text for contrast */
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #2a2a2a; /* Dark card background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Deep shadow for the card effect */
             border-radius: 8px;
         }
+
         h1, h2 {
             text-align: center;
+            color: #ffffff; /* White for headings */
         }
+
         form {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
+            color: #bbbbbb; /* Softer color for labels */
         }
-        input[type="text"], select, button {
+
+        input[type="text"], select, button, input[type="number"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid #444444; /* Darker border */
             border-radius: 4px;
             box-sizing: border-box;
+            background-color: #333333; /* Input fields dark background */
+            color: #ffffff; /* Light text color */
         }
+
         button {
-            background-color: #28a745;
+            background-color: #5300d6; /* Accent color */
             color: white;
             cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
         }
+
+        .red {
+            background-color: #8c0303; /* Accent color */
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .red:hover {
+            background-color: #730707; /* Darker on hover */
+        }
+
         button:hover {
-            background-color: #218838;
+            background-color: #3f00a8; /* Slightly darker on hover */
         }
+
         #bots-list {
             margin-top: 20px;
         }
+
         .bot-entry {
             display: flex;
             align-items: center;
             margin-bottom: 8px;
+            background-color: #3a3a3a; /* Card style for each bot entry */
+            padding: 10px;
+            border-radius: 4px;
         }
+
         .bot-entry input[type="checkbox"] {
             margin-right: 10px;
         }
+
         #log {
             margin-top: 20px;
-            background-color: #f0f0f0;
+            background-color: #333333; /* Dark log background */
             padding: 10px;
             border-radius: 4px;
             max-height: 200px;
             overflow-y: auto;
+            color: #ffffff; /* Log text color */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Shadow for the log area */
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #2a2a2a;
+            color: #bbbbbb;
+            border-top: 1px solid #444444;
+        }
+
+        footer a {
+            color: #5300d6;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #3f00a8;
         }
     </style>
 </head>
@@ -81,8 +141,12 @@
             <label for="username">Bot Username</label>
             <input type="text" id="username" placeholder="Enter bot username" required>
 
+
             <label for="version">Version</label>
             <input type="text" id="version" placeholder="Enter Minecraft version (optional)">
+            
+            <label for="WEBHOOK">WEB Hook</label>
+            <input type="text" id="discordWebhookURL" placeholder="Enter WEB HOOK" required>
 
             <button type="submit">Create Bot</button>
         </form>
@@ -91,19 +155,55 @@
         <div id="bots-list">
             <!-- Bots will be listed here -->
         </div>
+        <button class="red" type="button" id="disconnectBtn">Disconnect</button>
 
         <h2>Send Message to Bots</h2>
         <form id="send-message-form">
             <label for="message">Message</label>
             <input type="text" id="message" placeholder="Enter your message" required>
-
             <button type="button" id="sendMessageBtn">Send Message</button>
         </form>
+
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="trusteduser" placeholder="Enter name to trust or remove">
+        </div>
+        <button id="addTrustedPlayerBtn">Add Trusted Player</button>
+        <button class="red" id="removeTrustedPlayerBtn">Remove Trusted Player</button>
+        <div id="message" class="message"></div>
+
+        <!-- New functionalities for Goto, Follow, Disconnect, and Stop -->
+        <h2>Follow a Player</h2>
+        <form id="follow-player-form">
+            <label for="follow-player">Player Name</label>
+            <input type="text" id="follow-player" placeholder="Enter player name" required>
+            <button type="submit">Follow Player</button>
+        </form>
+
+        <h2>Go To Coordinates</h2>
+        <form id="goto-coordinates-form">
+            <label for="x-coordinate">X Coordinate</label>
+            <input type="number" id="x-coordinate" placeholder="X" required>
+            <label for="y-coordinate">Y Coordinate</label>
+            <input type="number" id="y-coordinate" placeholder="Y" required>
+            <label for="z-coordinate">Z Coordinate</label>
+            <input type="number" id="z-coordinate" placeholder="Z" required>
+            <button type="submit">Go To Coordinates</button>
+        </form>
+
+        <button class="red" type="button" id="stopBtn">Stop</button>
 
         <div id="log">
             <!-- Log messages will appear here -->
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 <a href="mailto:shamirbhuiyan2@gmail.com">Samir Bhuiyan</a>. All rights reserved.</p>
+        <p>Email: <a href="mailto:shamirbhuiyan2@gmail.com">shamirbhuiyan2@gmail.com</a></p>
+    </footer>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="scripts.js"></script>
